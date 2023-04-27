@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 
 // Retorna lista de itens no banco
-router.get('/', ( rep, res, next ) => {
+router.get('/', ( req, res, next ) => {
     res.status(200).send({
         mensage: 'ok orrrrrk'
     });
 });
 
 // Retorna um produto com base no nome
-router.get('/name=:name_item', ( rep, res, next ) => {
+router.get('/name=:name_item', ( req, res, next ) => {
     const name_item = req.params.name_item;
     if (name_item != null) {
         res.status(200).send({
@@ -23,21 +23,28 @@ router.get('/name=:name_item', ( rep, res, next ) => {
 });
 
 // Insere um item no banco
-router.post('/', ( rep, res, next ) => {
+router.post('/', ( req, res, next ) => {
+    const item = {
+        name_item: req.body.name_item,
+        quantity: req.body.quantity,
+        location: req.body.location
+    };
+
     res.status(201).send({
-        mensage: 'ok odddk'
+        mensage: 'item insert',
+        iItem: item
     });
 });
 
 // Atualiza um item no banco
-router.patch('/', ( rep, res, next ) => {
+router.patch('/', ( req, res, next ) => {
     res.status(200).send({
         mensage: 'ok offffk'
     });
 });
 
 // Deleta um item no banco
-router.delete('/', ( rep, res, next ) => {
+router.delete('/', ( req, res, next ) => {
     res.status(204).send({
         mensage: 'Item excluido com sucesso'
     });
