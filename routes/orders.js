@@ -25,14 +25,17 @@ router.get('/num_order=:num_order', ( req, res, next ) => {
 
 // Insere um pedido no banco
 router.post('/', ( req, res, next ) => {
-    let myuuid = uuidv4();
+    let base_uuid = uuidv4();
+    let date_now = new Date();
+    let new_uuid = date_now.getFullYear().toString() +"-"+ base_uuid
     const order = {
-        num_order: myuuid,
+        num_order: new_uuid,
         client: req.body.client,
         employee: req.body.employee,
         itens: req.body.itens,
         quantity: req.body.quantity,
-        status: req.body.status
+        status: req.body.status,
+        date: date_now
     };
 
     res.status(201).send({

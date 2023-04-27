@@ -11,7 +11,7 @@ app.use(morgan("dev")); // monitoramento
 app.use(bodyParser.urlencoded({ extends: false })); // restrição de envio: dados simples
 app.use(bodyParser.json()); // tipo de restrição: json
 
-app.use(( rep, res, next ) => {
+app.use(( req, res, next ) => {
     // permissão de origem de controle de acesso, restringe qual a url base para ter acesso a api
     res.header('Access-Control-Allow-Origin', '*');
     // restições de cabeçalho
@@ -40,7 +40,7 @@ app.use(( error, rep, res, next ) => {
     res.status(error.status || 500);
     return res.send({
         erro: {
-            mensage: error.mensage
+            message: error.message
         }
     });
 });
