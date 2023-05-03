@@ -11,6 +11,42 @@ router.get('/', ( req, res, next ) => {
             ( error, result, field ) => {
                 connection.release();
                 if ( error ) { return res.status( 500 ).send({ error: error }) };
+                
+                const response = {
+                    length: result.length,
+                    items: result.map(item => {
+                        return {
+                            itemId: item.id_item,
+                            name_item: item.name_item,
+                            quantity: item.quantity,
+                            location: item.location,
+                            request: {
+                                type: 'GET',
+                                description: 'Retorna os detalhes de um item específico',
+                                url: 'localhost:3000/items/' + item.id_item
+                                // url: process.env.URL_API + 'items/' + prod.itemId
+                            }
+                        }
+                    })
+                }
+
+                return res.status( 200 ).send({ response }); 
+            }
+        );
+    });
+});
+
+// Retorna um produto com base no id
+router.get('/:id_item', ( req, res, next ) => {
+    let id_item = req.params.id_item;
+    mysql.getConnection(( error, connection ) => {
+        if ( error ) { return res.status( 500 ).send({ error: error }) };
+        connection.query(
+            'SELECT * FROM items WHERE id_item = ?',
+            [ id_item ],
+            ( error, result, field ) => {
+                connection.release();
+                if ( error ) { return res.status( 500 ).send({ error: error, message: "Name not found" }) };
                 return res.status( 200 ).send({ response: result }); 
             }
         );
@@ -36,31 +72,36 @@ router.get('/name=:name_item', ( req, res, next ) => {
 
 // Insere um item no banco
 router.post('/', ( req, res, next ) => {
-    let item = {
-        name_item: req.body.name_item,
-        quantity: req.body.quantity,
-        location: req.body.location
-    };
+    // let item = {
+    //     name_item: req.body.name_item,
+    //     quantity: req.body.quantity,
+    //     location: req.body.location
+    // };
     mysql.getConnection(( error, connection ) => {
-        if ( error ) {
-            return res.status( 500 ).send({
-                error: error
-            });
-        };
+        if ( error ) { return res.status( 500 ).send({ error: error }) };
         connection.query(
-            'INSERT INTO items (name_item, quantity, location) VALUES (?,?,?);',
-            [
-                item.name_item, 
-                item.quantity, 
-                item.location
-            ],
+            'INSERT INTO items (name_item, quantity, location) VALUES (?,?,?)',
+            [ req.body.name_item, req.body.quantity, req.body.location, ],
             ( error, result, field ) => {
                 connection.release();
                 if ( error ) { return res.status( 500 ).send({ error: error, response: null }) };
-                res.status( 201 ).send({
-                    mensage: 'Item inserted successfully!!!',
-                    id_tem: result.InsertId
-                });
+
+                const response = {
+                    message: 'Item inserido com sucesso',
+                    createdProduct: {
+                        item_id: result.insertId,
+                        name_item: req.body.name_item,
+                        quantity: req.body.quantity,
+                        location: req.body.location,
+                        request: {
+                            type: 'POST',
+                            description: 'Retorna todos as caracteristicas do item',
+                            url: 'localhost:3000/items/'
+                        }
+                    }
+                };
+
+                res.status( 201 ).send({ response });
             }
         );
     });
